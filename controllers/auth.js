@@ -1,7 +1,6 @@
 const {user}=require('../models/userSchema')
 const bcrypt=require('bcrypt');
-const { sign } = require('jsonwebtoken');
-const {v4:uuid_v4}=require('uuid')
+const jwt=require('jsonwebtoken');
 
 exports.signUp=async (req,res)=>{
     try{
