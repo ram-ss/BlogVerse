@@ -5,7 +5,7 @@ const jwt=require('jsonwebtoken');
 exports.signUp=async (req,res)=>{
     try{
         const {email,password,confirmPassword,userName}=req.body;
-        const userPresent=user.findOne({email:email});
+        const userPresent=await user.findOne({email:email});
         if(userPresent){
             return res.status(401).json({
                 success:false,
@@ -25,7 +25,7 @@ exports.signUp=async (req,res)=>{
             userName:userName,
             userType:'user'
         })
-        return res.success(200).json({
+        return res.status(200).json({
             success:true,
             message:"user created successfully",
             newUser
@@ -42,7 +42,7 @@ exports.signUp=async (req,res)=>{
 exports.login=async (req,res)=>{
     try{
         const {email,password}=req.body;
-        const userPresent=await user.findOne({email:email});
+        let userPresent=await user.findOne({email:email});
         if(!userPresent){
             return res.status(404).json({
                 success:false,
@@ -53,9 +53,11 @@ exports.login=async (req,res)=>{
             const payload={
                 email:userPresent.email,
                 id:userPresent._id,
+                userName:userPresent.userName,
                 userType:userPresent.userType
             }
             const token=jwt.sign(payload,process.env.jwt_secret,{expiresIn:'2h'});
+            userPresent={...userPresent._doc};
             userPresent.token=token;
             userPresent.password=undefined;
             const options={
