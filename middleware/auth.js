@@ -4,17 +4,17 @@ require('dotenv').config()
 
 exports.auth=async (req,res,next)=>{
     try {
-        const token=await req.cookies._jwt
-        const verifyToken=jwt.verify(token,process.env.secretKeyCookie);
-        const registeredUser=await user.findOne({_id:verifyToken._id,"tokens.token":token})
+        const token=req.cookies.token
+        const verifyToken=await jwt.verify(token,process.env.jwt_secret);
+        console.log(verifyToken)
+        const registeredUser=await user.findById({_id:verifyToken.id})
         if(!registeredUser){
             throw new Error("Couldn't find registered user")
         }
         else{
-            req.token=token
-            req.registeredUser=registeredUser
-            req.id=registeredUser._id
-            next()
+            console.log(verifyToken);
+            req.user=verifyToken
+            next();
         }
     } catch (error) {
         console.log(error)
